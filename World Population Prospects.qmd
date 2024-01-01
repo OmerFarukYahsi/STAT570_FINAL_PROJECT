@@ -21,35 +21,35 @@ library(janitor)
 
 ```{r}
 
-
 # Specify the web address of the Excel file
 url <- "https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/1_General/WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
 
 raw_data <- "WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
 
 curl_download(url, destfile = raw_data)
+```
 
-#download.file ile almaya çalışınca hata verdi o yüzden curl_download kullandım excell file indirmek için 
+```{r}
 
-#download.file(url, raw_data,
-#              method = "auto",
-#              mode = "wb")
-
+# Downloaded sheets
 sheets <- excel_sheets(raw_data)
 
-read_clean <- function(..., sheet){
-  read_excel(..., sheet = sheet) |>
-    mutate(year = sheet)
+# Select the first two sheets
+selected_sheets <- sheets[1:2]
+
+# Function to read and clean data from a sheet
+read_clean <- function(file_path, sheet) {
+  read_excel(file_path, sheet = sheet, skip = 16, col_types = "text") |> 
+    mutate(type = sheet)
 }
 
-raw_data <- map(
-  sheets,
-  ~read_clean(raw_data,
-              skip = 15,
-              sheet = .)
-                   ) |>
-  bind_rows() |>
+# Read and clean selected sheets, then bind them into a single data frame
+data <- map_df(selected_sheets, ~read_clean(raw_data, .)) |> 
   clean_names()
+
+```
+
+```{r}
 
 ```
 
