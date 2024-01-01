@@ -1,0 +1,18 @@
+---
+title: "finalproject"
+author: "Zehra CEBECİ & Ömer Faruk YAHŞİ"
+format: html
+editor: visual
+---
+
+## STAT 570 - Final Project
+
+## Tidying and Visualization of UN Migration Data Set
+
+```{r}
+
+```
+
+```{r}
+
+```
