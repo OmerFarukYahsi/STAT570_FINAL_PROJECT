@@ -9,6 +9,50 @@ editor: visual
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
+```{r}
+library(tidyverse)
+library(readxl)
+library(curl)
+library(dplyr)
+library(purrr)
+library(stringr)
+library(janitor)
+```
+
+```{r}
+
+
+# Specify the web address of the Excel file
+url <- "https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/1_General/WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
+
+raw_data <- "WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
+
+curl_download(url, destfile = raw_data)
+
+#download.file ile almaya çalışınca hata verdi o yüzden curl_download kullandım excell file indirmek için 
+
+#download.file(url, raw_data,
+#              method = "auto",
+#              mode = "wb")
+
+sheets <- excel_sheets(raw_data)
+
+read_clean <- function(..., sheet){
+  read_excel(..., sheet = sheet) |>
+    mutate(year = sheet)
+}
+
+raw_data <- map(
+  sheets,
+  ~read_clean(raw_data,
+              skip = 15,
+              sheet = .)
+                   ) |>
+  bind_rows() |>
+  clean_names()
+
+```
+
 ## Running Code
 
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
