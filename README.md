@@ -1,0 +1,2 @@
+# STAT570_FINAL_PROJECT
+Final project of STAT 570 course / 2023 -2024 Fall Semester / METU - DEPARTMENT OF STATISTICS
