@@ -17,6 +17,7 @@ library(dplyr)
 library(purrr)
 library(stringr)
 library(janitor)
+library(ggplot2)
 ```
 
 ```{r}
@@ -24,15 +25,15 @@ library(janitor)
 # Specify the web address of the Excel file
 url <- "https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/1_General/WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
 
-raw_data <- "WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
+data <- "WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
 
-curl_download(url, destfile = raw_data)
+curl_download(url, destfile = data)
 ```
 
 ```{r}
 
 # Downloaded sheets
-sheets <- excel_sheets(raw_data)
+sheets <- excel_sheets(data)
 
 # Select the first two sheets
 selected_sheets <- sheets[1:2]
@@ -44,12 +45,61 @@ read_clean <- function(file_path, sheet) {
 }
 
 # Read and clean selected sheets, then bind them into a single data frame
-data <- map_df(selected_sheets, ~read_clean(raw_data, .)) |> 
+raw_data <- map_df(selected_sheets, ~read_clean(data, .)) |> 
   clean_names()
+```
+
+```{r}
+# Creating a new DataFrame without rows where 'type' is 'Label/Separator'
+raw_data_wo_ls <- subset(raw_data, type != "Label/Separator")
 
 ```
 
 ```{r}
+raw_data_wo_ls$total_population_as_of_1_january_thousands <- as.numeric(raw_data_wo_ls$total_population_as_of_1_january_thousands)
+raw_data_wo_ls$total_population_as_of_1_july_thousands <- as.numeric(raw_data_wo_ls$total_population_as_of_1_july_thousands)
+
+
+
+# Group by year and arrange by year
+sorted_data <- raw_data_wo_ls |> 
+  mutate(rate_of_change = ((total_population_as_of_1_january_thousands - total_population_as_of_1_july_thousands) / total_population_as_of_1_january_thousands) * 100) |>  
+  select(rate_of_change, everything()) |> 
+  group_by(year) |> 
+  arrange(year) |> 
+  ungroup()
+
+```
+
+```{r}
+
+# Create a ggplot with the specified columns
+ggplot(sorted_data, aes(x = year, y = rate_of_change)) +
+  geom_point() +
+  scale_y_continuous(name = "Population Rate of Change (%)", 
+                     limits = c(0, 100))+
+  labs(title = "Variation of Total Population Variation Over Years between 1 Jan 2022 to 1 July 2022") +
+  theme_minimal()+
+  scale_x_discrete(breaks = seq(1950, 2100, by = 10))
+
+```
+
+```{r}
+
+
+# Creating a new DataFrame without specific columns
+
+
+raw_data_reduced <- raw_data_wo_ls %>% select(-contains("_as_of_jun_1"), 
+                                              -index, 
+                                              -iso3_alpha_code, 
+                                              -is02_alpha_code,
+                                              -sdmx_code,
+                                              -parent_code,
+                                              
+                                              
+                                              
+                                              )
 
 ```
 
