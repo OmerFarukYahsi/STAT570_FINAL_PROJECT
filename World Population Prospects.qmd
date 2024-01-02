@@ -86,20 +86,38 @@ ggplot(sorted_data, aes(x = year, y = rate_of_change)) +
 
 ```{r}
 
-
 # Creating a new DataFrame without specific columns
+raw_data_reduced <- raw_data_wo_ls |> 
+  select(-contains("_as_of_1_january"), 
+         -index,
+         -iso3_alpha_code,
+         -iso2_alpha_code,
+         -sdmx_code,
+         -parent_code,
+         -notes,
+         -location_code
+         )
 
+```
 
-raw_data_reduced <- raw_data_wo_ls %>% select(-contains("_as_of_jun_1"), 
-                                              -index, 
-                                              -iso3_alpha_code, 
-                                              -is02_alpha_code,
-                                              -sdmx_code,
-                                              -parent_code,
-                                              
-                                              
-                                              
-                                              )
+```{r}
+raw_data_rounded <- raw_data_reduced |> 
+  mutate_at(vars(names(raw_data_reduced)[4:ncol(raw_data_reduced)]), as.numeric) |> 
+  mutate_at(vars(names(raw_data_reduced)[4:ncol(raw_data_reduced)]), ~round(., 3))
+```
+
+```{r}
+
+total_na_count <- sum(is.na(raw_data))
+
+print(total_na_count)
+
+raw_data_rounded_2 <- raw_data_rounded |> 
+  mutate_all(~ifelse(. == "...", NA, .)) 
+
+total_na_count_2 <- sum(is.na(raw_data_rounded_2))
+
+print(total_na_count_2)
 
 ```
 
