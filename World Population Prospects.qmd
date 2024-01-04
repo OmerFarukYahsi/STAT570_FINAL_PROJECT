@@ -253,7 +253,7 @@ custom_breaks <- seq(0, 750, by = 100)
 # Create the ggplot world map
 ggplot(world_population) +
   geom_sf(aes(fill = total_population_in_millions), color = "white", size = 0.2) +
-  scale_fill_gradientn(name = paste("Total Population (thousands) -", your_year), 
+  scale_fill_gradientn(name = paste("Total Population (millions) -", your_year), 
                        colors = rainbow(20),
                        limits = custom_limits,
                        oob = scales::squish,
