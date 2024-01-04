@@ -292,3 +292,29 @@ ggplot(filtered_data, aes(x = year, y = total_population_in_millions, group = co
   scale_y_continuous(limits = c(0, 1500), breaks = seq(0, 1500, by = 200))
 
 ```
+
+```{r}
+library(ggplot2)
+
+# Select a specific country to visualize
+selected_country <- "Türkiye"
+filtered_data <- country_area_level_filtered |> 
+  filter(country_and_area == selected_country)
+
+# Create a pyramid plot
+ggplot(filtered_data, aes(x = year, y = births_thousands, fill = "Births")) +
+  geom_bar(stat = "identity", position = "identity", width = 0.7) +
+  geom_bar(aes(x = year, y = -total_deaths_thousands, fill = "Deaths"), stat = "identity", position = "identity", width = 0.7) +
+  scale_y_continuous(labels = abs) +  # Use positive values for labels
+  labs(title = paste("Birth and Death Rate Comparison for", selected_country),
+       x = "Year",
+       y = "Count (in Thousands)",
+       fill = "Type") +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(),  # Hide y-axis labels
+        axis.ticks.y = element_blank(),  # Hide y-axis ticks
+        legend.title = element_blank(),  # Hide legend title
+        legend.position = "bottom") +  # Move legend to the bottom
+  scale_x_continuous(breaks = seq(1950, 2100, by = 20))  # Set custom breaks for the x-axis
+
+```
