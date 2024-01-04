@@ -150,20 +150,12 @@ sub_region_level_filtered <- raw_data_rounded |>
   select(-region_subregion_country_or_area) |> 
   relocate("sub_region", .after = "variant")
 
-# Entries containing the term "region" (case-insensitive) are filtered, indicating the Sub-Region level.
-# A new column 'sub_region' is created, capturing information from 'region_subregion_country_or_area.'
-# Unnecessary columns are deselected, and 'sub_region' is relocated after the 'variant' column.
-
 # Filtering and Creating New Columns for Region Level:
 region_level_filtered <- raw_data_rounded |>
   filter(str_detect(type, regex("Region|World", ignore_case = FALSE))) |> 
   mutate(region = region_subregion_country_or_area) |> 
   select(-region_subregion_country_or_area) |> 
   relocate("region", .after = "variant")
-
-# Entries containing the terms "Region" or "World" (case-insensitive) are filtered, representing the Region level.
-# A new column 'region' is created, extracting information from 'region_subregion_country_or_area.'
-# Unnecessary columns are deselected, and 'region' is relocated after the 'variant' column.
 
 # Filtering and Creating New Columns for Development Group Level:
 development_group_level_filtered <- raw_data_rounded |>
@@ -172,21 +164,15 @@ development_group_level_filtered <- raw_data_rounded |>
   select(-region_subregion_country_or_area) |> 
   relocate("development_group", .after = "variant")
 
-# Entries containing the term "Development Group" (case-insensitive) are filtered, indicating the Development Group level.
-# A new column 'development_group' is created, capturing information from 'region_subregion_country_or_area.'
-# Unnecessary columns are deselected, and 'development_group' is relocated after the 'variant' column.
-
 # Filtering and Creating New Columns for Income Group Level:
 income_group_level_filtered <- raw_data_rounded |>
   filter(str_detect(type, regex("Income Group", ignore_case = FALSE))) |> 
   mutate(income_group = region_subregion_country_or_area) |> 
   select(-region_subregion_country_or_area) |> 
   relocate("income_group", .after = "variant")
-
-# Entries containing the term "Income Group" (case-insensitive) are filtered, indicating the Income Group level.
-# A new column 'income_group' is created, extracting information from 'region_subregion_country_or_area.'
-# Unnecessary columns are deselected, and 'income_group' is relocated after the 'variant' column.
 ```
+
+## Data Visualization
 
 ```{r}
 # Load necessary libraries
@@ -195,36 +181,6 @@ library(sf)
 library(rnaturalearth)
 library(rnaturalearthdata)
 library(dplyr)
-
-
-# Replace 'your_year' with the specific year you want to map (e.g., 2021)
-your_year <- 2021
-
-# Filter the data frame for the specific year
-filtered_data <- country_area_level_filtered |> 
-  filter(year == your_year)
-
-
-# Load world map data
-world <- ne_countries(scale = "medium", returnclass = "sf")
-
-
-# Merge world map data with population data
-world_population <- merge(world, filtered_data, by.x = "iso_a3", by.y = "iso3_alpha_code", all.x = TRUE)
-
-custom_limits <- c(0, 700000)
-
-# Create the ggplot world map
-ggplot(world_population) +
-  geom_sf(aes(fill = total_population_as_of_1_july_thousands), color = "white", size = 0.2) +
-  scale_fill_viridis_c(name = paste("Total Population (thousands) -", your_year), 
-                       labels = scales::comma_format(),
-                       limits = custom_limits,
-                       oob = scales::squish) +
-  labs(title = "World Population Estimates",
-       caption = "Source: United Nations Population Prospects") +
-  theme_minimal()
-
 ```
 
 but in thousands it seems liitle bit weird because we can see all contries in the color scale.
@@ -236,29 +192,76 @@ your_year <- 2021
 # Filter the data frame for the specific year
 filtered_data <- country_area_level_filtered |> 
   filter(year == your_year) |> 
-  mutate(total_population_in_millions = (total_population_as_of_1_july_thousands*1000)/1000000)
-
+  mutate(total_population_in_millions = (total_population_as_of_1_july_thousands * 1000) / 1000000)
 
 # Load world map data
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
-
 # Merge world map data with population data
 world_population <- merge(world, filtered_data, by.x = "iso_a3", by.y = "iso3_alpha_code", all.x = TRUE)
 
-custom_limits <- c(0, 750)
-custom_breaks <- seq(0, 750, by = 100)
-
+# Set custom limits and breaks for the color scale
+custom_limits <- c(50, 1000)
+custom_breaks <- seq(50, 1000, by = 50)
 
 # Create the ggplot world map
 ggplot(world_population) +
   geom_sf(aes(fill = total_population_in_millions), color = "white", size = 0.2) +
   scale_fill_gradientn(name = paste("Total Population (millions) -", your_year), 
-                       colors = rainbow(20),
+                       colors = rainbow(10),
                        limits = custom_limits,
                        oob = scales::squish,
                        breaks = custom_breaks) +
   labs(title = "World Population Estimates",
        caption = "Source: United Nations Population Prospects") +
-  theme_minimal()
+  guides(fill = guide_colorbar(title.position = "top", keywidth = 2, keyheight = 10, label.position = "bottom", label.theme = element_text(size = 8))) +
+  theme_minimal() +
+  theme(legend.position = "bottom",  # Position the legend at the bottom
+        legend.box = "horizontal",  # Arrange the legend items horizontally
+        legend.direction = "horizontal",  # Display the legend items horizontally
+        legend.title.align = 0.5,  # Center the legend title
+        legend.key.size = unit(0.25, "cm"),
+        legend.key.width = unit(2.5, "cm"))
+```
+
+zoom in to turkey to investigate population estimation in 1950
+
+```{r}
+# Replace 'your_year' with the specific year you want to map (e.g., 1950)
+your_year <- 1950
+
+# Filter the data frame for the specific year
+filtered_data <- country_area_level_filtered |> 
+  filter(year == your_year) |> 
+  mutate(total_population_in_millions = (total_population_as_of_1_july_thousands * 1000) / 1000000)
+
+# Load world map data
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Merge world map data with population data
+world_population <- merge(world, filtered_data, by.x = "iso_a3", by.y = "iso3_alpha_code", all.x = TRUE)
+
+# Set custom limits and breaks for the color scale
+custom_limits <- c(50, 550)
+custom_breaks <- seq(50, 550, by = 50)
+
+# Create the ggplot world map
+ggplot(world_population) +
+  geom_sf(aes(fill = total_population_in_millions), color = "white", size = 0.2) +
+  scale_fill_gradientn(name = paste("Total Population (millions) -", your_year), 
+                       colors = rainbow(10),
+                       limits = custom_limits,
+                       oob = scales::squish,
+                       breaks = custom_breaks) +
+  labs(title = "World Population Estimates",
+       caption = "Source: United Nations Population Prospects") +
+  guides(fill = guide_colorbar(title.position = "top", keywidth = 2, keyheight = 10, label.position = "bottom", label.theme = element_text(size = 8))) +
+  theme_minimal() +
+  theme(legend.position = "bottom",  # Position the legend at the bottom
+        legend.box = "horizontal",  # Arrange the legend items horizontally
+        legend.direction = "horizontal",  # Display the legend items horizontally
+        legend.title.align = 0.5,  # Center the legend title
+        legend.key.size = unit(0.25, "cm"),
+        legend.key.width = unit(2.5, "cm"))+
+  coord_sf( xlim = c(0, 70), ylim = c(20, 50))  # Adjust xlim and ylim for the desired region
 ```
