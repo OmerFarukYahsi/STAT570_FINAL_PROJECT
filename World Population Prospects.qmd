@@ -375,3 +375,57 @@ ggplot(filtered_data, aes(x = year, fill = development_group)) +
   guides(fill = guide_legend(title = "Development Group"),
          alpha = "none")  # Remove the alpha legend
 ```
+
+```{r}
+data3<-raw_data_rounded[,c("life_expectancy_at_birth_both_sexes_years","male_life_expectancy_at_birth_years", "female_life_expectancy_at_birth_years")]
+
+df<-data3 %>% pivot_longer(cols=c("life_expectancy_at_birth_both_sexes_years","male_life_expectancy_at_birth_years", "female_life_expectancy_at_birth_years"),
+                           names_to='life_exp_for_gender',
+                           values_to='values')
+
+f <- df %>% filter(life_exp_for_gender == "female_life_expectancy_at_birth_years") |> na.omit()
+m <- df %>% filter(life_exp_for_gender == "male_life_expectancy_at_birth_years") |> na.omit()
+b <- df %>% filter(life_exp_for_gender=="life_expectancy_at_birth_both_sexes_years") |> na.omit()
+
+
+
+
+
+hc <- hchart(
+  density(b$values), type = "area", 
+  color = "steelblue", name = "Both Sexes"
+  ) %>%
+  hc_add_series(
+    density(f$values), type = "area",
+    color = "#B71C1C", 
+    name = "Female"
+    )%>%
+  hc_add_series(
+    density(m$values), type = "area",
+    color='orange',
+    name = "Male"
+    )%>%
+  hc_title(
+    text = "<b>Life Expectancy by Gender</b>",
+    margin = 20,
+    align = "left",
+    style = list(color = "#22A884", useHTML = TRUE)
+  )
+
+hc
+```
+
+```{r}
+data4<-raw_data_rounded[,c("total_deaths_thousands","male_deaths_thousands", "female_deaths_thousands")]
+
+df2<-data4 %>% pivot_longer(cols=c("total_deaths_thousands","male_deaths_thousands", "female_deaths_thousands"),names_to='deaths_for_gender',
+                           values_to='values')
+
+hcboxplot(x = df2$values, var = df2$deaths_for_gender, color = "darkred") %>% hc_yAxis(max = 1400) |> hc_plotOptions(boxplot = list(
+    fillColor = '#B71C1C',
+    lineWidth = 2,
+    whiskerLength = '20%',
+    whiskerWidth = 3,
+    color = 'black'
+  )) 
+```
