@@ -95,7 +95,6 @@ This reduction aimed to simplify the dataset, making it more manageable for subs
 raw_data_reduced <- raw_data_wo_ls |> 
   select(-contains("_as_of_1_january"), 
          -index,
-         -iso3_alpha_code,
          -iso2_alpha_code,
          -sdmx_code,
          -parent_code,
@@ -122,7 +121,7 @@ To rectify this issue, we took a two-step approach:
 raw_data_rounded <- raw_data_reduced |> 
   mutate(across(everything(), as.character)) |> 
   mutate_all(~ifelse(. == "...", NA, .)) |> 
-  mutate_at(vars(names(raw_data_reduced)[4:ncol(raw_data_reduced)]), as.numeric, ~round(., 3)) 
+  mutate_at(vars(names(raw_data_reduced)[5:ncol(raw_data_reduced)]), as.numeric, ~round(., 3)) 
 
 
 total_na_count_after <- sum(is.na(raw_data_rounded))
@@ -187,4 +186,79 @@ income_group_level_filtered <- raw_data_rounded |>
 # Entries containing the term "Income Group" (case-insensitive) are filtered, indicating the Income Group level.
 # A new column 'income_group' is created, extracting information from 'region_subregion_country_or_area.'
 # Unnecessary columns are deselected, and 'income_group' is relocated after the 'variant' column.
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(dplyr)
+
+
+# Replace 'your_year' with the specific year you want to map (e.g., 2021)
+your_year <- 2021
+
+# Filter the data frame for the specific year
+filtered_data <- country_area_level_filtered |> 
+  filter(year == your_year)
+
+
+# Load world map data
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+
+# Merge world map data with population data
+world_population <- merge(world, filtered_data, by.x = "iso_a3", by.y = "iso3_alpha_code", all.x = TRUE)
+
+custom_limits <- c(0, 700000)
+
+# Create the ggplot world map
+ggplot(world_population) +
+  geom_sf(aes(fill = total_population_as_of_1_july_thousands), color = "white", size = 0.2) +
+  scale_fill_viridis_c(name = paste("Total Population (thousands) -", your_year), 
+                       labels = scales::comma_format(),
+                       limits = custom_limits,
+                       oob = scales::squish) +
+  labs(title = "World Population Estimates",
+       caption = "Source: United Nations Population Prospects") +
+  theme_minimal()
+
+```
+
+but in thousands it seems liitle bit weird because we can see all contries in the color scale.
+
+```{r}
+# Replace 'your_year' with the specific year you want to map (e.g., 2021)
+your_year <- 2021
+
+# Filter the data frame for the specific year
+filtered_data <- country_area_level_filtered |> 
+  filter(year == your_year) |> 
+  mutate(total_population_in_millions = (total_population_as_of_1_july_thousands*1000)/1000000)
+
+
+# Load world map data
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+
+# Merge world map data with population data
+world_population <- merge(world, filtered_data, by.x = "iso_a3", by.y = "iso3_alpha_code", all.x = TRUE)
+
+custom_limits <- c(0, 750)
+custom_breaks <- seq(0, 750, by = 100)
+
+
+# Create the ggplot world map
+ggplot(world_population) +
+  geom_sf(aes(fill = total_population_in_millions), color = "white", size = 0.2) +
+  scale_fill_gradientn(name = paste("Total Population (thousands) -", your_year), 
+                       colors = rainbow(20),
+                       limits = custom_limits,
+                       oob = scales::squish,
+                       breaks = custom_breaks) +
+  labs(title = "World Population Estimates",
+       caption = "Source: United Nations Population Prospects") +
+  theme_minimal()
 ```
