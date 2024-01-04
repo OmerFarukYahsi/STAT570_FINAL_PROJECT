@@ -265,3 +265,30 @@ ggplot(world_population) +
         legend.key.width = unit(2.5, "cm"))+
   coord_sf( xlim = c(0, 70), ylim = c(20, 50))  # Adjust xlim and ylim for the desired region
 ```
+
+or we can observe total population variation across years for spesific countries
+
+```{r}
+# Select specific countries to visualize
+selected_countries <- c("Türkiye", "China", "United States of America", "Russian Federation", "United Kingdom", "France")
+filtered_data <- country_area_level_filtered |> 
+  filter(country_and_area %in% selected_countries) |> 
+  mutate(total_population_in_millions = (total_population_as_of_1_july_thousands * 1000) / 1000000)
+
+# Create a line plot with markers for each country
+ggplot(filtered_data, aes(x = year, y = total_population_in_millions, group = country_and_area, color = country_and_area, shape = country_and_area)) +
+  geom_line(size = 1) +
+  geom_point(size = 2, data = filtered_data |> filter(row_number() %% 20 == 1)) +
+  labs(title = "Population Variation Across Years",
+       x = "Year",
+       y = "Total Population (in Millions)",
+       color = "Country",
+       shape = "Country") +
+  theme_minimal() +
+  scale_color_brewer(palette="Dark2") +
+  scale_shape_manual(values = c(16, 17, 18, 19, 20, 15)) +
+  guides(color = guide_legend(title = "Country")) +
+  scale_x_continuous(limits = c(1950, 2100), breaks = seq(1950, 2100, by = 20)) +
+  scale_y_continuous(limits = c(0, 1500), breaks = seq(0, 1500, by = 200))
+
+```
