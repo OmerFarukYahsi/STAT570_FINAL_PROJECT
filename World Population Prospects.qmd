@@ -22,7 +22,7 @@ library(ggplot2)   # Data visualization using Grammar of Graphics
 
 The data set is presented in an excel sheet and there are combined columns. For example, for the first column, we should skip the first 16 rows in Excel. However, there are main categories for some columns. For example "Total Population, as of 1 January (thousands) " column is under the "Population" category and we have to skip the first 17 rows for this column.
 
-![](Ekran görüntüsü 2024-01-05 203937.png)
+![](Ekran%20görüntüsü%202024-01-05%20203937.png)
 
 The demographic data is obtained from an Excel file accessible via a specified URL. The file is downloaded utilizing the **curl_download** function, and the sheets of interest are identified.
 
@@ -65,6 +65,7 @@ raw_data_wo_ls <- subset(raw_data, type != "Label/Separator")
 We also convert population columns to numeric format and calculate the rate of change between January 1 and July 1 populations. The resulting data frame, **`sorted_data`**, is organized by year for further analysis.
 
 ```{r}
+#change required columns to numeric
 raw_data_wo_ls$total_population_as_of_1_january_thousands <- as.numeric(raw_data_wo_ls$total_population_as_of_1_january_thousands)
 raw_data_wo_ls$total_population_as_of_1_july_thousands <- as.numeric(raw_data_wo_ls$total_population_as_of_1_july_thousands)
 
@@ -156,7 +157,7 @@ sub_region_level_filtered <- raw_data_rounded |>
 
 # Filtering and Creating New Columns for Region Level:
 region_level_filtered <- raw_data_rounded |>
-  filter(str_detect(type, regex("Region|World", ignore_case = FALSE))) |> 
+  filter(str_detect(type, regex("Region", ignore_case = FALSE))) |> 
   mutate(region = region_subregion_country_or_area) |> 
   select(-region_subregion_country_or_area) |> 
   relocate("region", .after = "variant")
@@ -269,6 +270,45 @@ ggplot(world_population) +
         legend.key.size = unit(0.25, "cm"),
         legend.key.width = unit(2.5, "cm"))+
   coord_sf( xlim = c(0, 70), ylim = c(20, 50))  # Adjust xlim and ylim for the desired region
+```
+
+```{r}
+# Replace 'your_year' with the specific year you want to map (e.g., 2021)
+your_year <- 1990
+
+# Filter the data frame for the specific year
+filtered_data <- country_area_level_filtered |> 
+  filter(year == your_year)
+
+# Load world map data
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Merge world map data with population data
+world_population <- merge(world, filtered_data, by.x = "iso_a3", by.y = "iso3_alpha_code", all.x = TRUE)
+
+# Set custom limits and breaks for the color scale
+custom_limits <- c(-1000, 1000)
+custom_breaks <- seq(-1000, 1000, by = 100)
+
+# Create the ggplot world map
+ggplot(world_population) +
+  geom_sf(aes(fill = net_number_of_migrants_thousands), color = "white", size = 0.2) +
+  scale_fill_gradientn(name = paste("Net Migration Population (thousands) -", your_year), 
+                       colors = topo.colors(7),
+                       limits = custom_limits,
+                       oob = scales::squish,
+                       breaks = custom_breaks) +
+  labs(title = "Net Migration Number Estimates",
+       caption = "Source: United Nations Population Prospects") +
+  guides(fill = guide_colorbar(title.position = "top", keywidth = 2, keyheight = 10, label.position = "bottom", label.theme = element_text(size = 8))) +
+  theme_minimal() +
+  theme(legend.position = "bottom",  # Position the legend at the bottom
+        legend.box = "horizontal",  # Arrange the legend items horizontally
+        legend.direction = "horizontal",  # Display the legend items horizontally
+        legend.title.align = 0.5,  # Center the legend title
+        legend.key.size = unit(0.25, "cm"),
+        legend.key.width = unit(2.5, "cm"))+
+    coord_sf( xlim = c(0, 70), ylim = c(20, 50))  # Adjust xlim and ylim for the desired region
 ```
 
 or we can observe total population variation across years for spesific countries
@@ -460,3 +500,23 @@ hcboxplot(x = df2$values, var = df2$deaths_for_gender, color = "darkred") %>% hc
 ```
 
 When we look at the box plot of total deaths, we see that there is a similar distribution for women and men. However, the median value is higher for men.When we look at the box plot of total deaths, we see that there is a similar distribution for women and men. However, the median value is higher for men.
+
+```{r}
+# Select a specific country to visualize
+selected_regions <- "WORLD"
+
+# Filter the data
+filtered_data <- raw_data_rounded |>
+  filter(region_subregion_country_or_area %in% selected_regions) |>
+  mutate(population_in_billions = total_population_as_of_1_july_thousands * 1000 / 1000000000)
+
+# Create a bar chart with vertical bars
+ggplot(filtered_data, aes(x = year, y = population_in_billions)) +
+  geom_bar(stat = "identity", position = "identity", color = "blue", fill = "blue", width = 0.7) +
+  labs(title = "World Population Variation across Years",
+       x = "Year",
+       y = "Population Estimate and Medium (in billions)") +
+scale_x_continuous(breaks = seq(min(filtered_data$year), max(filtered_data$year), by = 10)) +
+  theme_minimal()
+
+```
