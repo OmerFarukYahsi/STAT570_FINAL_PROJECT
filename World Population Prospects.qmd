@@ -31,7 +31,9 @@ The demographic data is obtained from an Excel file accessible via a specified U
 url <- "https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/1_General/WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
 
 data <- "WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
+```
 
+```{r}
 curl_download(url, destfile = data)
 ```
 
@@ -517,6 +519,32 @@ ggplot(filtered_data, aes(x = year, y = population_in_billions)) +
        x = "Year",
        y = "Population Estimate and Medium (in billions)") +
 scale_x_continuous(breaks = seq(min(filtered_data$year), max(filtered_data$year), by = 10)) +
+  theme_minimal()
+
+```
+
+```{r}
+
+
+# Filter the data
+filtered_data <- region_level_filtered |> 
+  mutate(total_population_in_millions = total_population_as_of_1_july_thousands *1000/1000000 )
+
+# Create an area chart
+ggplot(filtered_data, aes(x = year, y = total_population_in_millions, fill = region)) +
+  geom_area(alpha = 0.7) +
+  # Add a dashed vertical line at x = 2021
+  geom_vline(xintercept = 2021, linetype = "dashed", color = "black", linewidth = 0.8) +
+  
+  # Add text annotations for arrows
+  annotate("text", x = 1980, y = 1800, label = "Estimate", vjust = -1) +
+  annotate("text", x = 2060, y = 1800, label = "Medium", vjust = -1) +
+  labs(title = "Global Population by Regions",
+       x = "Year",
+       y = "Population",
+       fill = "Region") +
+  scale_x_continuous(breaks = seq(1950, 2100, by = 30)) +  #scale_x_continuous
+  
   theme_minimal()
 
 ```
