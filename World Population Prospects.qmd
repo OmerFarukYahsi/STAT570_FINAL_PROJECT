@@ -5,6 +5,20 @@ format: html
 editor: visual
 ---
 
+## Introduction
+
+This term project provides an extensive examination of demographic variables through the use of data visualization and handling techniques. We aim to analyze and provide findings from a demographic dataset obtained from the United Nations Population Prospects. The dataset encompasses a wide range of demographic information, such as population, life expectancy, mortality rates, and more.
+
+The project commences with data cleaning and tidying, whereby different R libraries are imported for use in data manipulation, visualization, and cleaning. The dataset, sourced from an Excel file available via a specified URL, undergoes cleaning processes to handle combined columns, skip unnecessary rows, and standardize column names.
+
+The project extends into geographical data visualization, utilizing world maps to represent total population estimates, population density predictions, and net migration numbers for specific years and regions. The team zooms in on Turkey to investigate population density predictions ten years into the future, offering a localized perspective.
+
+Country-specific analyses are conducted, showcasing population variation trends over the years for selected countries. Additional visualizations include pyramid plots illustrating birth and death rate comparisons for specific countries and development group comparisons, providing insights into demographic dynamics.
+
+In addition, we conducted an in-depth examination of life expectancy, utilizing density plots and box plots to emphasize disparities between genders. The analysis focuses on total mortality rates using box plots, highlighting differences in median values across male and female cohorts.
+
+The project concludes with global and regional perspectives on population trends. Bar charts and area charts are employed to visualize world population variations across years and global population by regions, offering a comprehensive overview of the dataset.
+
 ## Data Cleaning and Tidying
 
 In order to start coding for our project we need to load the necessary libraries for the project, including data manipulation (**`tidyverse`**, **`dplyr`**, **`purrr`**), data visualization (**`ggplot2`**), and data cleaning (**`janitor`**).
@@ -26,9 +40,9 @@ The data set is presented in an excel sheet and there are combined columns. For 
 
 And data has wide form of variables, such as life expectancy for gender is reported as three different column rather than one column for gender and one for life expectancy.
 
-![](Ekran görüntüsü 2024-01-06 100239.png){fig-align="center" width="294"}
+![](Ekran%20görüntüsü%202024-01-06%20100239.png){fig-align="center" width="294"}
 
-The demographic data is obtained from an Excel file accessible via a specified URL. The file is downloaded utilizing the **curl_download** function, and the sheets of interest are identified.
+The demographic data is obtained from an Excel file accessible via a specified URL. The file is downloaded utilizing the **`curl_download`** function, and the sheets of interest are identified.
 
 ```{r}
 # Specify the web address of the Excel file
@@ -41,7 +55,7 @@ data <- "WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx"
 curl_download(url, destfile = data)
 ```
 
-**Read_clean**, a custom function, is utilized to extract and clear data from individual sheets. Using **clean_names** and **map_df**, the final data is combined into a single data frame and standardized column names are established.
+**`read_clean`**, a custom function, is utilized to extract and clear data from individual sheets. Using **`clean_names`** and **`map_df`**, the final data is combined into a single data frame and standardized column names are established.
 
 ```{r}
 
@@ -61,7 +75,9 @@ raw_data <- map_df(selected_sheets, ~read_clean(data, .)) |>
   clean_names()
 ```
 
-In this stage, we filter out rows with a specific type ('Label/Separator').
+Subsequently, a recognizable layout was obvious with the emergence of subheadings, effectively identifying countries, regions, and subregions. Particularly, the sections classified under these subheadings do not include specific data; instead, they serve as informative placeholders.
+
+![Informative rows in the orginal data](Screenshot%202024-01-06%20112425.png)In this stage, we filter out rows with a specific type ('Label/Separator').
 
 ```{r}
 # Creating a new DataFrame without rows where 'type' is 'Label/Separator'
@@ -97,7 +113,24 @@ ggplot(sorted_data, aes(x = year, y = rate_of_change)) +
   scale_x_discrete(breaks = seq(1950, 2100, by = 10))+ ylim(0,50)
 ```
 
-After an in-depth examination of the percentage variation in populations between January 1 and July 1, it became apparent that, aside from a few outliers, the rate of change across the six time periods is not significantly pronounced. In light of this observation, we proceeded with a data reduction process to streamline our dataset for a more focused analysis. This involved excluding specific columns that were deemed unnecessary for our current analytical objectives.
+After an in-depth examination of the percentage variation in populations between January 1 and July 1, it became apparent that, aside from a few outliers, the rate of change across the time periods is not significantly pronounced. Table formats were employed to identify outliers, pinpointing the specific years and countries where these anomalous data points emerged. This strategy enhances the understanding of events that are considered to be outliers.
+
+```{r}
+library(knitr)
+
+# Find the maximum rate_of_change and corresponding details
+top5_max_rate_data <- sorted_data |> 
+  top_n(8, rate_of_change) |> 
+  rename(countr_or_region =region_subregion_country_or_area)
+
+# Print the result
+formatted_table <- top5_max_rate_data[, c("countr_or_region","year", "rate_of_change")] |> 
+  kable()
+
+formatted_table
+```
+
+Upon examining the values within the table, a notable observation emerges—specific dates exhibiting the highest population changes over a 6-month period align with periods of conflict, indicating a correlation with wartime events. In light of this observation, we proceeded with a data reduction process to streamline our dataset for a more focused analysis. This involved excluding specific columns that were deemed unnecessary for our current analytical objectives.
 
 This reduction aimed to simplify the dataset, making it more manageable for subsequent analyses while retaining the essential information for our research
 
@@ -118,7 +151,7 @@ total_na_count <- sum(is.na(raw_data_reduced))
 print(total_na_count)
 ```
 
-Upon initial analysis, the results of the **`total_na_count`** indicated the absence of any missing values. However, during the exploration of the scatter plot, a warning surfaced, indicating the presence of rows with missing values. This discrepancy prompted a closer examination of the data quality.
+Upon initial analysis, the results of the **`total_na_count`** indicated the absence of 7399 missing values. However, during the exploration of the scatter plot, a warning surfaced, indicating the presence of rows with missing values about 31 thousand. This discrepancy prompted a closer examination of the data quality.
 
 Further investigation revealed that the missing values were not explicitly defined as 'NA.' Instead, an unconventional placeholder, represented by three dots ("..."), was used to indicate missing data in the initial untidy dataset.
 
@@ -185,6 +218,8 @@ income_group_level_filtered <- raw_data_rounded |>
 
 ## Data Visualization
 
+The inital data has been successfully transformed from a human-readable format to a machine-readable format. During this process, it was crucial to perform cleaning and tidying operations to enhance the quality of the data. Subsequently, we can proceed with visualizing our regular dataframes for a more comprehensive analysis.
+
 ```{r}
 # Load necessary libraries
 library(ggplot2)
@@ -195,7 +230,7 @@ library(dplyr)
 library(highcharter)
 ```
 
-but in thousands it seems liitle bit weird because we can see all contries in the color scale.
+We commence the data visualization process by utilizing global mapping. In the primary dataset, ISO3 alpha codes associated with each country are marked as variables in a dedicated column. By employing the merge function in the "rnaturalearth" package, we can effortlessly combine these codes over the worldwide map. Geographical data visualizations are presented, utilizing world maps to represent total population estimates, population density predictions, and net migration numbers for specific years and regions.
 
 ```{r}
 # Replace 'your_year' with the specific year you want to map (e.g., 2021)
@@ -236,16 +271,15 @@ ggplot(world_population) +
         legend.key.width = unit(2.5, "cm"))
 ```
 
-zoom in to turkey to investigate population estimation in 1950
+To focus specifically on Turkey and investigate population density predictions for the next ten years, we can utilize the "coord_sf" function. By implementing this function, we can narrow our visual representation to the geographical coordinates and spatial data relevant to Turkey, allowing for a more detailed examination of population density projections in the specified timeframe.
 
 ```{r}
-# Replace 'your_year' with the specific year you want to map (e.g., 1950)
-your_year <- 1950
+# Replace 'your_year' with the specific year you want to map (e.g., 2030)
+your_year <- 2034
 
 # Filter the data frame for the specific year
 filtered_data <- country_area_level_filtered |> 
-  filter(year == your_year) |> 
-  mutate(total_population_in_millions = (total_population_as_of_1_july_thousands * 1000) / 1000000)
+  filter(year == your_year)
 
 # Load world map data
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -259,13 +293,13 @@ custom_breaks <- seq(50, 550, by = 50)
 
 # Create the ggplot world map
 ggplot(world_population) +
-  geom_sf(aes(fill = total_population_in_millions), color = "white", size = 0.2) +
-  scale_fill_gradientn(name = paste("Total Population (millions) -", your_year), 
+  geom_sf(aes(fill = population_density_as_of_1_july_persons_per_square_km), color = "white", size = 0.2) +
+  scale_fill_gradientn(name = paste("Population Density (persons per sq. km) -", your_year), 
                        colors = rainbow(10),
                        limits = custom_limits,
                        oob = scales::squish,
                        breaks = custom_breaks) +
-  labs(title = "World Population Estimates",
+  labs(title = "Population Density Map",
        caption = "Source: United Nations Population Prospects") +
   guides(fill = guide_colorbar(title.position = "top", keywidth = 2, keyheight = 10, label.position = "bottom", label.theme = element_text(size = 8))) +
   theme_minimal() +
@@ -275,8 +309,12 @@ ggplot(world_population) +
         legend.title.align = 0.5,  # Center the legend title
         legend.key.size = unit(0.25, "cm"),
         legend.key.width = unit(2.5, "cm"))+
-  coord_sf( xlim = c(0, 70), ylim = c(20, 50))  # Adjust xlim and ylim for the desired region
+  coord_sf( xlim = c(-20, 70), ylim = c(10, 60))  # Adjust xlim and ylim for the desired region
 ```
+
+Additionally, recalling the scatter plot analysis where we examined the significance of changes in the upper region between January 1 and July 1, it was observed that the most substantial deviation during this 6-month period occurred in 1990, reaching 25 percent. We attributed this anomaly to the impact of wars, specifically pinpointing the Iraq-Kuwait War. Therefore, it is very likely that there was a significant increase in immigration from the afflicted countries during this period.
+
+In order to validate this theory, we conducted an experiment of mapping the net migration data for the year 1990 onto a global map. We restricted our investigation focus by explicitly zooming in on the region between Kuwait and Iraq. This allowed us to shed light on the migratory patterns in that area over the chosen period.
 
 ```{r}
 # Replace 'your_year' with the specific year you want to map (e.g., 2021)
@@ -317,7 +355,11 @@ ggplot(world_population) +
     coord_sf( xlim = c(0, 70), ylim = c(20, 50))  # Adjust xlim and ylim for the desired region
 ```
 
-or we can observe total population variation across years for spesific countries
+Based on the provided map, it is clear that approximately 2 million people escaped from Iraq and Kuwait and seek protection in other countries during the war between the two states. Iran is the main destination for a large number of immigrants, particularly during the Iraq-Kuwait War, since it is a nearby country that has taken in a big amount of displaced people.
+
+Due to the diverse nature of this database, it provides the potential to create multiple graphic representations and examine different aspects of the data through visualization. Our ability to adapt and utilize various visualization methods, including charts, graphs, and maps, enables us to get valuable insights into diverse facets of the given information.
+
+Consequently, we have created an interactive line plot using the 'highcharter' library to examine the changes in total population over time for several nations, including the five permanent members of the United Nations and Turkey. This study encompasses the period from 1950 to 2100, providing a thorough examination of demographic shifts over an extended time frame.
 
 ```{r}
 # Select specific countries to visualize
@@ -340,67 +382,68 @@ hc <- filtered_data %>%
   hc_yAxis(title = list(text = "Total Population (in Millions)"))
 
 hc
-
-
-# # Create a line plot with markers for each country
-# ggplot(filtered_data, aes(x = year, y = total_population_in_millions, group = country_and_area, color = country_and_area, shape = country_and_area)) +
-#   geom_line(size = 1) +
-#   geom_point(size = 2, data = filtered_data |> filter(row_number() %% 20 == 1)) +
-#   labs(title = "Population Variation Across Years",
-#        x = "Year",
-#        y = "Total Population (in Millions)",
-#        color = "Country",
-#        shape = "Country") +
-#   theme_minimal() +
-#   scale_color_brewer(palette="Dark2") +
-#   scale_shape_manual(values = c(16, 17, 18, 19, 20, 15)) +
-#   guides(color = guide_legend(title = "Country")) +
-#   scale_x_continuous(limits = c(1950, 2100), breaks = seq(1950, 2100, by = 20)) +
-#   scale_y_continuous(limits = c(0, 1500), breaks = seq(0, 1500, by = 200))
-
-
-
 ```
+
+According to the depicted graph, considering the current total population status of the four countries aside from the United States and China, it can be inferred that minor fluctuations may occur over the next 70 years, but significant changes are not anticipated. Conversely, the American population is projected to persist in its growth trajectory, converging towards approximately 400 million. The most noteworthy transformation is anticipated in the Chinese population, where the current figure of around 1.5 billion is expected to decrease by nearly half, reaching approximately 750 million. This forecast suggests a substantial shift in demographic trends over the specified timeframe.
+
+In order to conduct a more thorough study about the Chinese population, a pyramid-shaped chart has been created using the birth and death rate variables from the data frame.
 
 ```{r}
-data3<-raw_data_rounded[,c("life_expectancy_at_birth_both_sexes_years","male_life_expectancy_at_birth_years", "female_life_expectancy_at_birth_years")]
 
-df<-data3 %>% pivot_longer(cols=c("life_expectancy_at_birth_both_sexes_years","male_life_expectancy_at_birth_years", "female_life_expectancy_at_birth_years"),
-                           names_to='life_exp_for_gender',
-                           values_to='values')
+# Select a specific country to visualize
+selected_country <- "China"
+filtered_data <- country_area_level_filtered |> 
+  filter(country_and_area == selected_country)
 
-f <- df %>% filter(life_exp_for_gender == "female_life_expectancy_at_birth_years") |> na.omit()
-m <- df %>% filter(life_exp_for_gender == "male_life_expectancy_at_birth_years") |> na.omit()
-b <- df %>% filter(life_exp_for_gender=="life_expectancy_at_birth_both_sexes_years") |> na.omit()
-
-
-
-
-hc <- hchart(
-  density(b$values), type = "area", 
-  color = "steelblue", name = "Both Sexes"
-  ) %>%
-  hc_add_series(
-    density(f$values), type = "area",
-    color = "#B71C1C", 
-    name = "Female"
-    )%>%
-  hc_add_series(
-    density(m$values), type = "area",
-    color='orange',
-    name = "Male"
-    )%>%
-  hc_title(
-    text = "<b>Life Expectancy by Gender</b>",
-    margin = 20,
-    align = "left",
-    style = list(color = "#22A884", useHTML = TRUE)
-  )
-
-hc
+# Create a pyramid plot
+ggplot(filtered_data, aes(x = year, y = births_thousands, fill = "Births")) +
+  geom_bar(stat = "identity", position = "identity", width = 0.7) +
+  geom_bar(aes(x = year, y = -total_deaths_thousands, fill = "Deaths"), stat = "identity", position = "identity", width = 0.7) +
+  scale_y_continuous(labels = abs) +  # Use positive values for labels
+  labs(title = paste("Birth and Death Rate Comparison for", selected_country),
+       x = "Year",
+       y = "Count (in Thousands)",
+       fill = "Type") +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(),  # Hide y-axis labels
+        axis.ticks.y = element_blank(),  # Hide y-axis ticks
+        legend.title = element_blank(),  # Hide legend title
+        legend.position = "bottom") +  # Move legend to the bottom
+  scale_x_continuous(breaks = seq(1950, 2100, by = 20))  # Set custom breaks for the x-axis
 ```
 
-According to the density plot, the distribution of life expectancy for both men and women is left skewed. However, the average life expectancy for women seems to be slightly longer than that of men.
+As depicted in the Birth and Death Rate Comparison chart for China, there is a notable trend indicating that death rates are projected to be approximately twice as high as birth rates in the future. This dynamic forecasts a consistent population decline over time. A closer examination of the graph reveals historical peaks in death rates for China, notably occurring between 1959 and 1961, with the highest death rate observed in 1960.
+
+This particular time frame aligns with the infamous China's Great Leap Famine, during which approximately 55 million people succumbed to hunger over the course of these three years.
+
+Similarly, a pyramid-shaped chart was created to compare the birth and death rates in Turkey and examine the projected demographic trends. Projections indicate that the current younger profile of the population will steadily decrease after 2030, as the number of births decreases and mortality rates stabilize. This shift demonstrates a decrease in population growth and a corresponding tendency of aging, matching the demographic patterns seen in present-day European countries.
+
+Furthermore, an examination of Turkey's historical data uncovers surges in mortality rates for the years 2019 to 2021. Significantly, this timeframe coincides with the worldwide repercussions of the Covid-19 pandemic, which have affected population trends and led to increased death rates at that period.
+
+```{r}
+# Select a specific country to visualize
+selected_country <- "Türkiye"
+filtered_data <- country_area_level_filtered |> 
+  filter(country_and_area == selected_country)
+
+# Create a pyramid plot
+ggplot(filtered_data, aes(x = year, y = births_thousands, fill = "Births")) +
+  geom_bar(stat = "identity", position = "identity", width = 0.7) +
+  geom_bar(aes(x = year, y = -total_deaths_thousands, fill = "Deaths"), stat = "identity", position = "identity", width = 0.7) +
+  scale_y_continuous(labels = abs) +  # Use positive values for labels
+  labs(title = paste("Birth and Death Rate Comparison for", selected_country),
+       x = "Year",
+       y = "Count (in Thousands)",
+       fill = "Type") +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(),  # Hide y-axis labels
+        axis.ticks.y = element_blank(),  # Hide y-axis ticks
+        legend.title = element_blank(),  # Hide legend title
+        legend.position = "bottom") +  # Move legend to the bottom
+  scale_x_continuous(breaks = seq(1950, 2100, by = 20))  # Set custom breaks for the x-axis
+```
+
+An interactive box plot titled "Life Expectancy Across Countries" has been created using the Highcharter library. This plot incorporates insights obtained from birth and death statistics, as well as future predictions. The purpose of this visualization is to enhance the level of sophistication in our studies by offering a thorough perspective on the patterns in life expectancy across different countries.
 
 ```{r}
 data4<-raw_data_rounded[,c("male_deaths_thousands", "female_deaths_thousands")]
@@ -429,58 +472,113 @@ hcboxplot(x = filtered_data_new$life_expectancy_at_birth_both_sexes_years, var =
   )
 ```
 
-When we look at the box plot of life expectancy across countries, Türkiye has 79.08 median value,while France has the highest median life expectancy value,83.9 and Russia has the lowest median life expectancy with 74.8.
+Upon evaluating the box plot illustrating life expectancy among different countries, Turkey is shown to have a median value of 79.08 years. France has the highest median life expectancy of 83.9 years, indicating a greater life expectancy compared to other countries. Russia has the lowest median life expectancy among the observed countries, standing at 74.8 years. The fluctuations in average lifespan highlight the contrasting health and demographic circumstances that exist among various countries.
+
+*(When we look at the box plot of life expectancy across countries, Türkiye has 79.08 median value,while France has the highest median life expectancy value,83.9 and Russia has the lowest median life expectancy with 74.8.)*
+
+To further explore life expectancy dynamics, a "Life Expectancy by Gender" chart has been generated.
 
 ```{r}
-library(ggplot2)
+data3<-raw_data_rounded[,c("life_expectancy_at_birth_both_sexes_years","male_life_expectancy_at_birth_years", "female_life_expectancy_at_birth_years")]
 
-# Select a specific country to visualize
-selected_country <- "Türkiye"
-filtered_data <- country_area_level_filtered |> 
-  filter(country_and_area == selected_country)
+df<-data3 %>% pivot_longer(cols=c("life_expectancy_at_birth_both_sexes_years","male_life_expectancy_at_birth_years", "female_life_expectancy_at_birth_years"),
+                           names_to='life_exp_for_gender',
+                           values_to='values')
 
-# Create a pyramid plot
-ggplot(filtered_data, aes(x = year, y = births_thousands, fill = "Births")) +
-  geom_bar(stat = "identity", position = "identity", width = 0.7) +
-  geom_bar(aes(x = year, y = -total_deaths_thousands, fill = "Deaths"), stat = "identity", position = "identity", width = 0.7) +
-  scale_y_continuous(labels = abs) +  # Use positive values for labels
-  labs(title = paste("Birth and Death Rate Comparison for", selected_country),
-       x = "Year",
-       y = "Count (in Thousands)",
-       fill = "Type") +
-  theme_minimal() +
-  theme(axis.text.y = element_blank(),  # Hide y-axis labels
-        axis.ticks.y = element_blank(),  # Hide y-axis ticks
-        legend.title = element_blank(),  # Hide legend title
-        legend.position = "bottom") +  # Move legend to the bottom
-  scale_x_continuous(breaks = seq(1950, 2100, by = 20))  # Set custom breaks for the x-axis
- 
+f <- df %>% filter(life_exp_for_gender == "female_life_expectancy_at_birth_years") |> na.omit()
+m <- df %>% filter(life_exp_for_gender == "male_life_expectancy_at_birth_years") |> na.omit()
+b <- df %>% filter(life_exp_for_gender=="life_expectancy_at_birth_both_sexes_years") |> na.omit()
+
+hc <- hchart(
+  density(b$values), type = "area", 
+  color = "steelblue", name = "Both Sexes"
+  ) %>%
+  hc_add_series(
+    density(f$values), type = "area",
+    color = "#B71C1C", 
+    name = "Female"
+    )%>%
+  hc_add_series(
+    density(m$values), type = "area",
+    color='orange',
+    name = "Male"
+    )%>%
+  hc_title(
+    text = "<b>Life Expectancy by Gender</b>",
+    margin = 20,
+    align = "left",
+    style = list(color = "#22A884", useHTML = TRUE)
+  )
+
+hc
 ```
+
+According to the study of the density plot, the distribution of life expectancy for both males and females seems to be left-skewed. Although there is a little imbalance, it is evident that, on average, women have a somewhat higher life expectancy than men. This observation is consistent with larger demographic trends that frequently imply a higher life expectancy for women.
+
+*(According to the density plot, the distribution of life expectancy for both men and women is left skewed. However, the average life expectancy for women seems to be slightly longer than that of men.)*
 
 ```{r}
-library(ggplot2)
 
-# Select a specific country to visualize
-selected_country <- "China"
-filtered_data <- country_area_level_filtered |> 
-  filter(country_and_area == selected_country)
+data4<-raw_data_rounded[,c("male_deaths_thousands", "female_deaths_thousands")]
 
-# Create a pyramid plot
-ggplot(filtered_data, aes(x = year, y = births_thousands, fill = "Births")) +
-  geom_bar(stat = "identity", position = "identity", width = 0.7) +
-  geom_bar(aes(x = year, y = -total_deaths_thousands, fill = "Deaths"), stat = "identity", position = "identity", width = 0.7) +
-  scale_y_continuous(labels = abs) +  # Use positive values for labels
-  labs(title = paste("Birth and Death Rate Comparison for", selected_country),
-       x = "Year",
-       y = "Count (in Thousands)",
-       fill = "Type") +
-  theme_minimal() +
-  theme(axis.text.y = element_blank(),  # Hide y-axis labels
-        axis.ticks.y = element_blank(),  # Hide y-axis ticks
-        legend.title = element_blank(),  # Hide legend title
-        legend.position = "bottom") +  # Move legend to the bottom
-  scale_x_continuous(breaks = seq(1950, 2100, by = 20))  # Set custom breaks for the x-axis
+df2<-data4 %>% pivot_longer(cols=c("male_deaths_thousands", "female_deaths_thousands"),names_to='deaths_for_gender',
+                           values_to='values')
+
+hcboxplot(x = df2$values, var = df2$deaths_for_gender, color = "darkred") %>% hc_yAxis(max = 1400) |> hc_plotOptions(boxplot = list(
+    fillColor = '#B71C1C',
+    lineWidth = 2,
+    whiskerLength = '20%',
+    whiskerWidth = 3,
+    color = 'black'
+  ))  |>   hc_title(
+    text = "<b>Total Deaths by Gender</b>",
+    margin = 20,
+    align = "left",
+    style = list(color = "#22A884", useHTML = TRUE)
+  )
 ```
+
+To investigate whether the observed higher life expectancy for women is reflected in the total death rates, a "Total Deaths by Gender" bar chart has been generated.
+
+*(buraya yorum eklersin belki)*
+
+Afterthat, we have created a chart called 'Mortality Rate Trends Over Time (per 1000 people)' to analyze the varying trends of mortality rates across the global population. The presentation provides a complete perspective on the long-term trend of mortality rates at a global level. The figure focuses primarily on three key mortality indicators: Infant Mortality (number of deaths per 1,000 live births among newborns), Under-five Deaths (number of deaths under the age of 5 per 1,000 live births), and Deaths Before Age 40 (number of deaths under the age of 40 per 1,000 adults).
+
+```{r}
+# Define custom legend labels
+legend_labels <- c(
+  "infant_mortality_rate_infant_deaths_per_1_000_live_births" = "Infant Mortality",
+  "under_five_mortality_deaths_under_age_5_per_1_000_live_births" = "Under-Five Mortality",
+  "mortality_before_age_40_both_sexes_deaths_under_age_40_per_1_000_live_births" = "Mortality before Age 40"
+)
+
+# Filter the data
+filtered_data <- raw_data_rounded |> 
+  filter(region_subregion_country_or_area == "WORLD")
+
+# Filter data for mortality rates
+mortality_data <- filtered_data[, c("year", "infant_mortality_rate_infant_deaths_per_1_000_live_births", "under_five_mortality_deaths_under_age_5_per_1_000_live_births", "mortality_before_age_40_both_sexes_deaths_under_age_40_per_1_000_live_births")]
+
+# Filter data for mortality rates
+mortality_data_long <- mortality_data |> 
+  select(year, contains("mortality")) |> 
+  pivot_longer(cols = -year, names_to = "MortalityType", values_to = "Rate") |> 
+  group_by(MortalityType)  # Group by MortalityType
+
+# Plot mortality rate trends
+ggplot(mortality_data_long, aes(x = year, y = Rate, color = MortalityType)) +
+  geom_line() +
+  scale_color_manual(values = c("red", "blue", "green"), name = "Mortality Type", labels = legend_labels) +
+  labs(title = "Mortality Rate Trends Over Time (per 1000 people)",
+       x = "Year",
+       y = "Mortality Rate") +
+  scale_x_continuous(breaks = seq(1950, 2100, by = 30)) + 
+  theme_minimal()
+```
+
+The mortality trends exhibit a notable evolution across different eras. In the mid-1900s, there was a pronounced increase in mortality rates among infants and young individuals, possibly influenced by global wars during that time. However, a significant decline has been observed since the 2000s, attributed to technological advancements, improvements in healthcare systems, and an overall enhancement in the quality of life.
+
+Moreover, in order to examine the potential correlation between a nation's level of development and its rates of birth and death, an area chart titled "Over Time Birth and Death Rate Comparison" has been created. This graphic explicitly contrasts the patterns observed in "More developed regions" with "Less developed regions".
 
 ```{r}
 
@@ -514,29 +612,9 @@ ggplot(filtered_data, aes(x = year, fill = development_group)) +
          alpha = "none")  # Remove the alpha legend
 ```
 
-```         
-```
+The graph demonstrates that, throughout history and until now, the mortality and fertility rates in less developed nations are roughly five times greater than those in more developed countries. This noticeable pattern seems likely to continue in the future. Nevertheless, the projected rise in mortality rates in less developed nations can be seen as a possible sign that these populations might eventually stabilize, leading to a decline in population growth momentum.
 
-```{r}
-data4<-raw_data_rounded[,c("male_deaths_thousands", "female_deaths_thousands")]
-
-df2<-data4 %>% pivot_longer(cols=c("male_deaths_thousands", "female_deaths_thousands"),names_to='deaths_for_gender',
-                           values_to='values')
-
-hcboxplot(x = df2$values, var = df2$deaths_for_gender, color = "darkred") %>% hc_yAxis(max = 1400) |> hc_plotOptions(boxplot = list(
-    fillColor = '#B71C1C',
-    lineWidth = 2,
-    whiskerLength = '20%',
-    whiskerWidth = 3,
-    color = 'black'
-  ))  |>   hc_title(
-    text = "<b>Total Deaths by Gender</b>",
-    margin = 20,
-    align = "left",
-    style = list(color = "#22A884", useHTML = TRUE)
-  )
-
-```
+Eventually, after incorporating all the acquired knowledge, a "World Population Variation Across Years" graphic has been produced, employing a billion population scale to visually depict the overall population variance and forecasts for the global populace in the future.
 
 ```{r}
 # Select a specific country to visualize
@@ -558,8 +636,9 @@ scale_x_continuous(breaks = seq(min(filtered_data$year), max(filtered_data$year)
 
 ```
 
-```{r}
+Over the upcoming 20 years, it is anticipated that the world population will experience about 33 percent increase compared to the current figure, reaching a total of 10 billion. To assess the distribution of this anticipated population increase at the continental level, a population density chart has been created, segmented by continents.
 
+```{r}
 
 # Filter the data
 filtered_data <- region_level_filtered |> 
@@ -583,3 +662,19 @@ ggplot(filtered_data, aes(x = year, y = total_population_in_millions, fill = reg
   theme_minimal()
 
 ```
+
+The estimations suggest that the most substantial contribution to global population growth will come from regions in Africa and Asia. This trend aligns with the development levels observed in these regions. The correlation between population growth and development levels underscores the complex interplay of socio-economic factors influencing demographic trends.
+
+## Conclusions
+
+To summarize, our investigation explored worldwide demographic patterns, finding insights into life expectancy, fatality rates, and birth and mortality trends. The life expectancy distribution, which was skewed to the left, showed that women had a slightly higher average life expectancy, consistent with well-established demographic trends. The mortality rate trends have demonstrated historical changes that were influenced by global events and subsequent progress.
+
+The comparison of birth and death rates in more and less developed regions highlights a consistent disparity, which demonstrates the complex relationship between socio-economic development and demographic indicators. The visualization depicts a notable rise in world population, mostly driven by major contributions from Africa and Asia.
+
+The advantages of utilizing data visualization and cleaning approaches were clearly apparent during the analysis. The density plot, bar charts, and area charts offered a clarity and effortlessly understandable depiction of complicated demographic trends. The technique of tidying and cleaning data allowed a more efficient analysis procedure, ensuring both the accuracy and reliability of our findings.
+
+To summarize, this study highlights the importance of data visualization and data cleaning in understanding complex demographic patterns. Through the utilization of visual reports, which compress complex datasets, a greater understanding of worldwide patterns is achieved.
+
+## References
+
+<https://population.un.org/wpp/Download/Standard/MostUsed/>
