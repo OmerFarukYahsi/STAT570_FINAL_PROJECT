@@ -22,7 +22,11 @@ library(ggplot2)   # Data visualization using Grammar of Graphics
 
 The data set is presented in an excel sheet and there are combined columns. For example, for the first column, we should skip the first 16 rows in Excel. However, there are main categories for some columns. For example "Total Population, as of 1 January (thousands)" column is under the "Population" category and we have to skip the first 17 rows for this column.
 
-![](Ekran%20görüntüsü%202024-01-05%20203937.png)
+![](Ekran%20görüntüsü%202024-01-05%20203937.png){fig-align="center"}
+
+And data has wide form of variables, such as life expectancy for gender is reported as three different column rather than one column for gender and one for life expectancy.
+
+![](Ekran görüntüsü 2024-01-06 100239.png){fig-align="center" width="294"}
 
 The demographic data is obtained from an Excel file accessible via a specified URL. The file is downloaded utilizing the **curl_download** function, and the sheets of interest are identified.
 
@@ -424,7 +428,9 @@ hcboxplot(x = filtered_data_new$life_expectancy_at_birth_both_sexes_years, var =
     style = list(color = "#22A884", useHTML = TRUE)
   )
 ```
- When we look at the box plot of life expectancy across countries, Türkiye has 79.08 median value,while France has the highest median life expectancy value,83.9 and Russia has the lowest median life expectancy with 74.8.
+
+When we look at the box plot of life expectancy across countries, Türkiye has 79.08 median value,while France has the highest median life expectancy value,83.9 and Russia has the lowest median life expectancy with 74.8.
+
 ```{r}
 library(ggplot2)
 
@@ -508,7 +514,7 @@ ggplot(filtered_data, aes(x = year, fill = development_group)) +
          alpha = "none")  # Remove the alpha legend
 ```
 
-```{}
+```         
 ```
 
 ```{r}
@@ -531,8 +537,6 @@ hcboxplot(x = df2$values, var = df2$deaths_for_gender, color = "darkred") %>% hc
   )
 
 ```
-
-
 
 ```{r}
 # Select a specific country to visualize
