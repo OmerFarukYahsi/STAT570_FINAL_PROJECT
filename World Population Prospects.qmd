@@ -130,7 +130,7 @@ formatted_table <- top5_max_rate_data[, c("countr_or_region","year", "rate_of_ch
 formatted_table
 ```
 
-Upon examining the values within the table, a notable observation emerges—specific dates exhibiting the highest population changes over a 6-month period align with periods of conflict, indicating a correlation with wartime events. In light of this observation, we proceeded with a data reduction process to streamline our dataset for a more focused analysis. This involved excluding specific columns that were deemed unnecessary for our current analytical objectives.
+Upon examining the values within the table, a notable observation emerges---specific dates exhibiting the highest population changes over a 6-month period align with periods of conflict, indicating a correlation with wartime events. In light of this observation, we proceeded with a data reduction process to streamline our dataset for a more focused analysis. This involved excluding specific columns that were deemed unnecessary for our current analytical objectives.
 
 This reduction aimed to simplify the dataset, making it more manageable for subsequent analyses while retaining the essential information for our research
 
@@ -474,7 +474,6 @@ hcboxplot(x = filtered_data_new$life_expectancy_at_birth_both_sexes_years, var =
 
 Upon evaluating the box plot illustrating life expectancy among different countries, Turkey is shown to have a median value of 79.08 years. France has the highest median life expectancy of 83.9 years, indicating a greater life expectancy compared to other countries. Russia has the lowest median life expectancy among the observed countries, standing at 74.8 years. The fluctuations in average lifespan highlight the contrasting health and demographic circumstances that exist among various countries.
 
-*(When we look at the box plot of life expectancy across countries, Türkiye has 79.08 median value,while France has the highest median life expectancy value,83.9 and Russia has the lowest median life expectancy with 74.8.)*
 
 To further explore life expectancy dynamics, a "Life Expectancy by Gender" chart has been generated.
 
@@ -515,32 +514,7 @@ hc
 
 According to the study of the density plot, the distribution of life expectancy for both males and females seems to be left-skewed. Although there is a little imbalance, it is evident that, on average, women have a somewhat higher life expectancy than men. This observation is consistent with larger demographic trends that frequently imply a higher life expectancy for women.
 
-*(According to the density plot, the distribution of life expectancy for both men and women is left skewed. However, the average life expectancy for women seems to be slightly longer than that of men.)*
 
-```{r}
-
-data4<-raw_data_rounded[,c("male_deaths_thousands", "female_deaths_thousands")]
-
-df2<-data4 %>% pivot_longer(cols=c("male_deaths_thousands", "female_deaths_thousands"),names_to='deaths_for_gender',
-                           values_to='values')
-
-hcboxplot(x = df2$values, var = df2$deaths_for_gender, color = "darkred") %>% hc_yAxis(max = 1400) |> hc_plotOptions(boxplot = list(
-    fillColor = '#B71C1C',
-    lineWidth = 2,
-    whiskerLength = '20%',
-    whiskerWidth = 3,
-    color = 'black'
-  ))  |>   hc_title(
-    text = "<b>Total Deaths by Gender</b>",
-    margin = 20,
-    align = "left",
-    style = list(color = "#22A884", useHTML = TRUE)
-  )
-```
-
-To investigate whether the observed higher life expectancy for women is reflected in the total death rates, a "Total Deaths by Gender" bar chart has been generated.
-
-*(buraya yorum eklersin belki)*
 
 Afterthat, we have created a chart called 'Mortality Rate Trends Over Time (per 1000 people)' to analyze the varying trends of mortality rates across the global population. The presentation provides a complete perspective on the long-term trend of mortality rates at a global level. The figure focuses primarily on three key mortality indicators: Infant Mortality (number of deaths per 1,000 live births among newborns), Under-five Deaths (number of deaths under the age of 5 per 1,000 live births), and Deaths Before Age 40 (number of deaths under the age of 40 per 1,000 adults).
 
