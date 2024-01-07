@@ -658,6 +658,27 @@ ggplot(filtered_data, aes(x = year, y = total_population_in_millions, fill = reg
 
 The estimations suggest that the most substantial contribution to global population growth will come from regions in Africa and Asia. This trend aligns with the development levels observed in these regions. The correlation between population growth and development levels underscores the complex interplay of socio-economic factors influencing demographic trends.
 
+```{r}
+selected_countries <- c("Türkiye")
+filtered_data <- country_area_level_filtered |> 
+  filter(country_and_area %in% selected_countries)
+
+hc <- filtered_data %>% 
+  hchart(
+  'line', hcaes(x = year, y = net_number_of_migrants_thousands, group = country_and_area)
+  ) %>%
+  hc_title(
+    text = "<b>Total Number of Migrants</b>",
+    margin = 20,
+    align = "left",
+    style = list(color = "#22A884", useHTML = TRUE)
+  )%>%
+  hc_xAxis(title = list(text = "Year")) %>%
+  hc_yAxis(title = list(text = "Total Migrants (in Thousands)")) |> hc_xAxis(plotLines = list(list(value = 2022)))
+
+hc
+```
+
 ## Conclusions
 
 To summarize, our investigation explored worldwide demographic patterns, finding insights into life expectancy, fatality rates, and birth and mortality trends. The life expectancy distribution, which was skewed to the left, showed that women had a slightly higher average life expectancy, consistent with well-established demographic trends. The mortality rate trends have demonstrated historical changes that were influenced by global events and subsequent progress.
