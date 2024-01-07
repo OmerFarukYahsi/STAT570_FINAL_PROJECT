@@ -379,12 +379,34 @@ hc <- filtered_data %>%
     style = list(color = "#22A884", useHTML = TRUE)
   )%>%
   hc_xAxis(title = list(text = "Year")) %>%
-  hc_yAxis(title = list(text = "Total Population (in Millions)"))
+  hc_yAxis(title = list(text = "Total Population (in Millions)")) |> hc_xAxis(plotLines = list(list(value = 2022)))
 
 hc
 ```
 
 According to the depicted graph, considering the current total population status of the four countries aside from the United States and China, it can be inferred that minor fluctuations may occur over the next 70 years, but significant changes are not anticipated. Conversely, the American population is projected to persist in its growth trajectory, converging towards approximately 400 million. The most noteworthy transformation is anticipated in the Chinese population, where the current figure of around 1.5 billion is expected to decrease by nearly half, reaching approximately 750 million. This forecast suggests a substantial shift in demographic trends over the specified timeframe.
+
+```{r}
+selected_countries <- c("Türkiye",  "United States of America", "Russian Federation", "United Kingdom", "France")
+filtered_data <- country_area_level_filtered |> 
+  filter(country_and_area %in% selected_countries) |> 
+  mutate(total_population_in_millions = (total_population_as_of_1_july_thousands * 1000) / 1000000)
+
+hc <- filtered_data %>% 
+  hchart(
+  'line', hcaes(x = year, y = total_population_in_millions, group = country_and_area)
+  ) %>%
+  hc_title(
+    text = "<b>Population Variation Across Years (Except China)</b>",
+    margin = 20,
+    align = "left",
+    style = list(color = "#22A884", useHTML = TRUE)
+  )%>%
+  hc_xAxis(title = list(text = "Year")) %>%
+  hc_yAxis(title = list(text = "Total Population (in Millions)")) |> hc_xAxis(plotLines = list(list(value = 2022)))
+
+hc
+```
 
 In order to conduct a more thorough study about the Chinese population, a pyramid-shaped chart has been created using the birth and death rate variables from the data frame.
 
@@ -474,7 +496,6 @@ hcboxplot(x = filtered_data_new$life_expectancy_at_birth_both_sexes_years, var =
 
 Upon evaluating the box plot illustrating life expectancy among different countries, Turkey is shown to have a median value of 79.08 years. France has the highest median life expectancy of 83.9 years, indicating a greater life expectancy compared to other countries. Russia has the lowest median life expectancy among the observed countries, standing at 74.8 years. The fluctuations in average lifespan highlight the contrasting health and demographic circumstances that exist among various countries.
 
-
 To further explore life expectancy dynamics, a "Life Expectancy by Gender" chart has been generated.
 
 ```{r}
@@ -513,8 +534,6 @@ hc
 ```
 
 According to the study of the density plot, the distribution of life expectancy for both males and females seems to be left-skewed. Although there is a little imbalance, it is evident that, on average, women have a somewhat higher life expectancy than men. This observation is consistent with larger demographic trends that frequently imply a higher life expectancy for women.
-
-
 
 Afterthat, we have created a chart called 'Mortality Rate Trends Over Time (per 1000 people)' to analyze the varying trends of mortality rates across the global population. The presentation provides a complete perspective on the long-term trend of mortality rates at a global level. The figure focuses primarily on three key mortality indicators: Infant Mortality (number of deaths per 1,000 live births among newborns), Under-five Deaths (number of deaths under the age of 5 per 1,000 live births), and Deaths Before Age 40 (number of deaths under the age of 40 per 1,000 adults).
 
