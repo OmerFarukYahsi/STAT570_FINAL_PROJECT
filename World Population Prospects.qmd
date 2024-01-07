@@ -7,7 +7,7 @@ editor: visual
 
 ## Introduction
 
-This term project provides an extensive examination of demographic variables through the use of data visualization and handling techniques. We aim to analyze and provide findings from a demographic dataset obtained from the United Nations Population Prospects. The dataset encompasses a wide range of demographic information, such as population, life expectancy, mortality rates, and more.
+This term project provides an extensive examination of demographic variables through the use of data visualization and handling techniques. We aim to analyze and provide findings from a demographic dataset obtained from the United Nations Population Prospects \[1\]. The dataset encompasses a wide range of demographic information, such as population, life expectancy, mortality rates, and more.
 
 The project commences with data cleaning and tidying, whereby different R libraries are imported for use in data manipulation, visualization, and cleaning. The dataset, sourced from an Excel file available via a specified URL, undergoes cleaning processes to handle combined columns, skip unnecessary rows, and standardize column names.
 
@@ -130,7 +130,7 @@ formatted_table <- top5_max_rate_data[, c("countr_or_region","year", "rate_of_ch
 formatted_table
 ```
 
-Upon examining the values within the table, a notable observation emerges---specific dates exhibiting the highest population changes over a 6-month period align with periods of conflict, indicating a correlation with wartime events. In light of this observation, we proceeded with a data reduction process to streamline our dataset for a more focused analysis. This involved excluding specific columns that were deemed unnecessary for our current analytical objectives.
+Upon examining the values within the table, a notable observation emerges specific dates exhibiting the highest population changes over a 6-month period align with periods of conflict, indicating a correlation with wartime events \[2\]. In light of this observation, we proceeded with a data reduction process to streamline our dataset for a more focused analysis. This involved excluding specific columns that were deemed unnecessary for our current analytical objectives.
 
 This reduction aimed to simplify the dataset, making it more manageable for subsequent analyses while retaining the essential information for our research
 
@@ -151,15 +151,15 @@ total_na_count <- sum(is.na(raw_data_reduced))
 print(total_na_count)
 ```
 
-Upon initial analysis, the results of the **`total_na_count`** indicated the absence of 7399 missing values. However, during the exploration of the scatter plot, a warning surfaced, indicating the presence of rows with missing values about 31 thousand. This discrepancy prompted a closer examination of the data quality.
+Upon initial analysis, the results of the **`total_na_count`** indicated the absence of 7399 missing values. However, during the exploration of the scatter plot, a warning surfaced, indicating the presence of rows with missing values about 31885. This discrepancy prompted a closer examination of the data quality.
 
-Further investigation revealed that the missing values were not explicitly defined as 'NA.' Instead, an unconventional placeholder, represented by three dots ("..."), was used to indicate missing data in the initial untidy dataset.
+Further investigation revealed that the missing values were not explicitly defined as '**`NA`**'. Instead, an unconventional placeholder, represented by three dots ("**`...`**"), was used to indicate missing data in the initial untidy dataset.
 
 To rectify this issue, we took a two-step approach:
 
-1.  **Replacing "..." with NA:** All occurrences of the three dots ("...") in the dataset were replaced with the standard 'NA' representation. This step was crucial for ensuring uniformity and accuracy in identifying missing values across the dataset.
+1.  **Replacing "..." with NA:** All occurrences of the three dots ("**`...`**") in the dataset were replaced with the standard '**`NA`**' representation. This step was crucial for ensuring uniformity and accuracy in identifying missing values across the dataset.
 
-2.  **Conversion to Numeric:** Subsequently, we converted all related columns with numerical values from character (string) to numeric format. This conversion ensured that the data, now with consistent missing value representation, could be accurately processed and analyzed.
+2.  **Conversion to Numeric:** Subsequently, we converted all related columns with numerical values from character (**`string`**) to numeric format. This conversion ensured that the data, now with consistent missing value representation, could be accurately processed and analyzed.
 
 ```{r}
 raw_data_rounded <- raw_data_reduced |> 
@@ -230,7 +230,7 @@ library(dplyr)
 library(highcharter)
 ```
 
-We commence the data visualization process by utilizing global mapping. In the primary dataset, ISO3 alpha codes associated with each country are marked as variables in a dedicated column. By employing the merge function in the "rnaturalearth" package, we can effortlessly combine these codes over the worldwide map. Geographical data visualizations are presented, utilizing world maps to represent total population estimates, population density predictions, and net migration numbers for specific years and regions.
+We commence the data visualization process by utilizing global mapping. In the primary dataset, ISO3 alpha codes associated with each country are marked as variables in a dedicated column. By employing the merge function in the "**`rnaturalearth`**" package, we can effortlessly combine these codes over the worldwide map. Geographical data visualizations are presented, utilizing world maps to represent total population estimates, population density predictions, and net migration numbers for specific years and regions.
 
 ```{r}
 # Replace 'your_year' with the specific year you want to map (e.g., 2021)
@@ -271,7 +271,7 @@ ggplot(world_population) +
         legend.key.width = unit(2.5, "cm"))
 ```
 
-To focus specifically on Turkey and investigate population density predictions for the next ten years, we can utilize the "coord_sf" function. By implementing this function, we can narrow our visual representation to the geographical coordinates and spatial data relevant to Turkey, allowing for a more detailed examination of population density projections in the specified timeframe.
+To focus specifically on Turkey and investigate population density predictions for the next ten years, we can utilize the "**`coord_Sf`**" function. By implementing this function, we can narrow our visual representation to the geographical coordinates and spatial data relevant to Turkey, allowing for a more detailed examination of population density projections in the specified timeframe.
 
 ```{r}
 # Replace 'your_year' with the specific year you want to map (e.g., 2030)
@@ -312,7 +312,7 @@ ggplot(world_population) +
   coord_sf( xlim = c(-20, 70), ylim = c(10, 60))  # Adjust xlim and ylim for the desired region
 ```
 
-Additionally, recalling the scatter plot analysis where we examined the significance of changes in the upper region between January 1 and July 1, it was observed that the most substantial deviation during this 6-month period occurred in 1990, reaching 25 percent. We attributed this anomaly to the impact of wars, specifically pinpointing the Iraq-Kuwait War. Therefore, it is very likely that there was a significant increase in immigration from the afflicted countries during this period.
+Additionally, recalling the scatter plot analysis where we examined the significance of changes in the upper region between January 1 and July 1, it was observed that the most substantial deviation during this 6-month period occurred in 1990, reaching 25 percent. We attributed this anomaly to the impact of wars, specifically pinpointing the Iraq-Kuwait Gulf War \[3\]. Therefore, it is very likely that there was a significant increase in immigration from the afflicted countries during this period.
 
 In order to validate this theory, we conducted an experiment of mapping the net migration data for the year 1990 onto a global map. We restricted our investigation focus by explicitly zooming in on the region between Kuwait and Iraq. This allowed us to shed light on the migratory patterns in that area over the chosen period.
 
@@ -359,7 +359,7 @@ Based on the provided map, it is clear that approximately 2 million people escap
 
 Due to the diverse nature of this database, it provides the potential to create multiple graphic representations and examine different aspects of the data through visualization. Our ability to adapt and utilize various visualization methods, including charts, graphs, and maps, enables us to get valuable insights into diverse facets of the given information.
 
-Consequently, we have created an interactive line plot using the 'highcharter' library to examine the changes in total population over time for several nations, including the five permanent members of the United Nations and Turkey. This study encompasses the period from 1950 to 2100, providing a thorough examination of demographic shifts over an extended time frame.
+Consequently, we have created an interactive line plot using the '**`highcharter`**' library to examine the changes in total population over time for several nations, including the five permanent members of the United Nations and Turkey. This study encompasses the period from 1950 to 2100, providing a thorough examination of demographic shifts over an extended time frame.
 
 ```{r}
 # Select specific countries to visualize
@@ -436,7 +436,7 @@ ggplot(filtered_data, aes(x = year, y = births_thousands, fill = "Births")) +
 
 As depicted in the Birth and Death Rate Comparison chart for China, there is a notable trend indicating that death rates are projected to be approximately twice as high as birth rates in the future. This dynamic forecasts a consistent population decline over time. A closer examination of the graph reveals historical peaks in death rates for China, notably occurring between 1959 and 1961, with the highest death rate observed in 1960.
 
-This particular time frame aligns with the infamous China's Great Leap Famine, during which approximately 55 million people succumbed to hunger over the course of these three years.
+This particular time frame aligns with the infamous China's Great Leap Famine \[4\], during which approximately 55 million people succumbed to hunger over the course of these three years.
 
 Similarly, a pyramid-shaped chart was created to compare the birth and death rates in Turkey and examine the projected demographic trends. Projections indicate that the current younger profile of the population will steadily decrease after 2030, as the number of births decreases and mortality rates stabilize. This shift demonstrates a decrease in population growth and a corresponding tendency of aging, matching the demographic patterns seen in present-day European countries.
 
@@ -465,9 +465,33 @@ ggplot(filtered_data, aes(x = year, y = births_thousands, fill = "Births")) +
   scale_x_continuous(breaks = seq(1950, 2100, by = 20))  # Set custom breaks for the x-axis
 ```
 
+In addition, after obtaining information about the general attitudes towards birth rates, mortality, and population estimates in our nation, we have decided to examine the potential future  action regarding the complicated issue of refugee and migration issues, which is currently a significant concern in our country.
+
+```{r}
+selected_countries <- c("Türkiye")
+filtered_data <- country_area_level_filtered |> 
+  filter(country_and_area %in% selected_countries)
+
+hc <- filtered_data |> 
+  hchart(
+  'line', hcaes(x = year, y = net_number_of_migrants_thousands, group = country_and_area)
+  ) %>%
+  hc_title(
+    text = "<b>Total Number of Migrants</b>",
+    margin = 20,
+    align = "left",
+    style = list(color = "#22A884", useHTML = TRUE)
+  )%>%
+  hc_xAxis(title = list(text = "Year")) %>%
+  hc_yAxis(title = list(text = "Total Migrants (in Thousands)")) |> hc_xAxis(plotLines = list(list(value = 2022)))
+
+hc
+```
+
 An interactive box plot titled "Life Expectancy Across Countries" has been created using the Highcharter library. This plot incorporates insights obtained from birth and death statistics, as well as future predictions. The purpose of this visualization is to enhance the level of sophistication in our studies by offering a thorough perspective on the patterns in life expectancy across different countries.
 
 ```{r}
+selected_countries <- c("Türkiye",  "United States of America", "Russian Federation", "United Kingdom", "France")
 data4<-raw_data_rounded[,c("male_deaths_thousands", "female_deaths_thousands")]
 
 df2<-data4 %>% pivot_longer(cols=c("male_deaths_thousands", "female_deaths_thousands"),names_to='deaths_for_gender',
@@ -569,7 +593,7 @@ ggplot(mortality_data_long, aes(x = year, y = Rate, color = MortalityType)) +
   theme_minimal()
 ```
 
-The mortality trends exhibit a notable evolution across different eras. In the mid-1900s, there was a pronounced increase in mortality rates among infants and young individuals, possibly influenced by global wars during that time. However, a significant decline has been observed since the 2000s, attributed to technological advancements, improvements in healthcare systems, and an overall enhancement in the quality of life.
+The mortality trends exhibit a notable evolution across different eras. In the mid-1900s, there was a pronounced increase in mortality rates among infants and young individuals, possibly influenced by global wars during that time. However, a significant decline has been observed since the 2000s, attributed to technological advancements, improvements in healthcare systems, and an overall enhancement in the quality of life \[5\].
 
 Moreover, in order to examine the potential correlation between a nation's level of development and its rates of birth and death, an area chart titled "Over Time Birth and Death Rate Comparison" has been created. This graphic explicitly contrasts the patterns observed in "More developed regions" with "Less developed regions".
 
@@ -658,27 +682,6 @@ ggplot(filtered_data, aes(x = year, y = total_population_in_millions, fill = reg
 
 The estimations suggest that the most substantial contribution to global population growth will come from regions in Africa and Asia. This trend aligns with the development levels observed in these regions. The correlation between population growth and development levels underscores the complex interplay of socio-economic factors influencing demographic trends.
 
-```{r}
-selected_countries <- c("Türkiye")
-filtered_data <- country_area_level_filtered |> 
-  filter(country_and_area %in% selected_countries)
-
-hc <- filtered_data %>% 
-  hchart(
-  'line', hcaes(x = year, y = net_number_of_migrants_thousands, group = country_and_area)
-  ) %>%
-  hc_title(
-    text = "<b>Total Number of Migrants</b>",
-    margin = 20,
-    align = "left",
-    style = list(color = "#22A884", useHTML = TRUE)
-  )%>%
-  hc_xAxis(title = list(text = "Year")) %>%
-  hc_yAxis(title = list(text = "Total Migrants (in Thousands)")) |> hc_xAxis(plotLines = list(list(value = 2022)))
-
-hc
-```
-
 ## Conclusions
 
 To summarize, our investigation explored worldwide demographic patterns, finding insights into life expectancy, fatality rates, and birth and mortality trends. The life expectancy distribution, which was skewed to the left, showed that women had a slightly higher average life expectancy, consistent with well-established demographic trends. The mortality rate trends have demonstrated historical changes that were influenced by global events and subsequent progress.
@@ -691,4 +694,12 @@ To summarize, this study highlights the importance of data visualization and dat
 
 ## References
 
-<https://population.un.org/wpp/Download/Standard/MostUsed/>
+\[1\] <https://population.un.org/wpp/Download/Standard/MostUsed/>
+
+\[2\] <https://www.iwm.org.uk/history/timeline-of-20th-and-21st-century-wars>
+
+\[3\] <https://www.britannica.com/event/Persian-Gulf-War>
+
+\[4\] <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1127087/>
+
+\[5\] [Rippe JM. Lifestyle Strategies for Risk Factor Reduction, Prevention, and Treatment of Cardiovascular Disease. Am J Lifestyle Med. 2018 Dec 2;13(2):204-212. doi: 10.1177/1559827618812395. PMID: 30800027; PMCID: PMC6378495.]{.underline}
