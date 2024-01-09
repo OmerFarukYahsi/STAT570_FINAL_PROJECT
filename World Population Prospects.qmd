@@ -491,7 +491,7 @@ hc
 An interactive box plot titled "Life Expectancy Across Countries" has been created using the Highcharter library. This plot incorporates insights obtained from birth and death statistics, as well as future predictions. The purpose of this visualization is to enhance the level of sophistication in our studies by offering a thorough perspective on the patterns in life expectancy across different countries.
 
 ```{r}
-selected_countries <- c("Türkiye",  "United States of America", "Russian Federation", "United Kingdom", "France")
+selected_countries <- c("Türkiye",  "United States of America", "Russian Federation", "United Kingdom", "France","China")
 data4<-raw_data_rounded[,c("male_deaths_thousands", "female_deaths_thousands")]
 
 df2<-data4 %>% pivot_longer(cols=c("male_deaths_thousands", "female_deaths_thousands"),names_to='deaths_for_gender',
