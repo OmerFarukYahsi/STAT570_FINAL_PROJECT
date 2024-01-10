@@ -9,10 +9,8 @@ Authors: Zehra Cebeci, Omer Faruk Yahsi
 
 Mail Address : [zehra.cebeci\@metu.edu.tr](zehra.cebeci@metu.edu.tr), [yahsi.omer\@metu.edu.tr](yahsi.omer@metu.edu.tr)
 
-:::{.callout-note}
-
+::: callout-note
 This document is a product of the final project for the STAT 570 lecture, focusing on data handling and visualization tools. It is essential to acknowledge that minor errors may be present, and the methods employed may not necessarily reflect the optimal approach related to the dataset.
-
 :::
 
 ## Introduction
