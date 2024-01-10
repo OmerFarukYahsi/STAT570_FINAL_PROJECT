@@ -1,9 +1,19 @@
 ---
-title: "STAT570_Final_Project"
-author: "Zehra Cebeci, Ömer Faruk Yahşi"
 format: html
 editor: visual
 ---
+
+# Visualizing Global Demographics: Insights from UN Population Prospects 2022
+
+Authors: Zehra Cebeci, Omer Faruk Yahsi
+
+Mail Address : [zehra.cebeci\@metu.edu.tr](zehra.cebeci@metu.edu.tr), [yahsi.omer\@metu.edu.tr](yahsi.omer@metu.edu.tr)
+
+:::{.callout-note}
+
+This document is a product of the final project for the STAT 570 lecture, focusing on data handling and visualization tools. It is essential to acknowledge that minor errors may be present, and the methods employed may not necessarily reflect the optimal approach related to the dataset.
+
+:::
 
 ## Introduction
 
@@ -32,6 +42,7 @@ library(purrr)     # Functional programming tools
 library(stringr)   # String manipulation functions
 library(janitor)   # Tools for data cleaning
 library(ggplot2)   # Data visualization using Grammar of Graphics
+options(warn=-1)
 ```
 
 The data set is presented in an excel sheet and there are combined columns. For example, for the first column, we should skip the first 16 rows in Excel. However, there are main categories for some columns. For example "Total Population, as of 1 January (thousands)" column is under the "Population" category and we have to skip the first 17 rows for this column.
